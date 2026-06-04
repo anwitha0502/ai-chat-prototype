@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Powered Live Chat with Suggestions</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; }
+        .header { background: #2563eb; color: white; padding: 15px; text-align: center; }
+        #chat { height: 420px; overflow-y: auto; background: white; margin: 20px; border-radius: 10px; padding: 15px; border: 1px solid #ddd; }
+        .msg { margin: 8px 0; padding: 10px; border-radius: 8px; max-width: 75%; }
+        .user { background: #dbeafe; margin-left: auto; }
+        .ai { background: #e5e7eb; }
+        .bottom { display: flex; gap: 10px; padding: 20px; }
+        input { flex: 1; padding: 12px; }
+        button { padding: 12px 20px; cursor: pointer; }
+        .suggestions { margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .suggestion { background: #2563eb; color: white; padding: 8px 12px; border-radius: 5px; cursor: pointer; }
+        .suggestion:hover { background: #1e50c7; }
+    </style>
+</head>
+<body>
+    <div class="header"><h2>AI Powered Instant Messaging with Suggestions</h2></div>
+
+    <div id="chat">
+        <div class="msg ai">AI: Hello! How can I help you today?</div>
+    </div>
+
+    <div class="bottom">
+        <input id="message" placeholder="Type a message..." />
+        <button onclick="sendMessage()">Send</button>
+    </div>
+    
+    <div class="suggestions" id="suggestions"></div>
+
+    <script>
+        let lastUserMessage = ""; // Track last user message for context
+
+        function aiReply(text) {
+            text = text.toLowerCase();
+            if (text.includes("hello")) return "Hello! Nice to meet you.";
+            if (text.includes("project")) return "This is a live chat application with AI-powered messaging.";
+            if (text.includes("help")) return "I can answer questions and provide instant replies.";
+            if (text.includes("bye")) return "Goodbye! Have a great day.";
+            return "AI Response: I received your message: '" + text + "'";
+        }
+
+        function addMessage(text, type) {
+            let div = document.createElement("div");
+            div.className = "msg " + type;
+            div.innerText = text;
+            document.getElementById("chat").appendChild(div);
+            document.getElementById("chat").scrollTop = document.getElementById("chat").scrollHeight;
+        }
+
+        function generateSuggestions() {
+            const suggestionsDiv = document.getElementById("suggestions");
+            suggestionsDiv.innerHTML = ""; // Clear old suggestions
+            const text = lastUserMessage.toLowerCase();
+
+            let options = [];
+            if (text.includes("hello")) {
+                options = ["Hi", "Hello", "Hey there"];
+            } else if (text.includes("bye")) {
+                options = ["Goodbye", "See you", "Take care"];
+            } else if (text.includes("help")) {
+                options = ["Can you assist me?", "I need help", "Tell me more"];
+            } else if (text.includes("project")) {
+                options = ["Tell me about the project", "What details do you need?", "More info on the project"];
+            }
+
+            options.forEach(opt => {
+                let btn = document.createElement("div");
+                btn.className = "suggestion";
+                btn.innerText = opt;
+                btn.onclick = function () { setMessage(opt); };
+                suggestionsDiv.appendChild(btn);
+            });
+        }
+
+        function setMessage(text) {
+            document.getElementById("message").value = text;
+        }
+
+        function sendMessage() {
+            let input = document.getElementById("message");
+            let text = input.value.trim();
+            if (!text) return;
+
+            lastUserMessage = text; // Store for suggestions
+            addMessage("You: " + text, "user");
+            input.value = "";
+
+            generateSuggestions(); // Update suggestions
+
+            setTimeout(() => {
+                addMessage("AI: " + aiReply(text), "ai");
+            }, 700);
+        }
+
+        document.getElementById("message").addEventListener("keypress", function (e) {
+            if (e.key === "Enter") sendMessage();
+        });
+    </script>
+</body>
+</html>
